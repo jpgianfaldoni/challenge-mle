@@ -1,7 +1,59 @@
 # challenge-mle
 
-## Dependencies
-To install the dependencies run `pip install -r requirements.txt` on the root folder
+## How to Run
+Clone the Repository
+
+```
+git clone https://github.com/your-username/challenge-mle.git
+cd challenge-mle
+```
+Install dependencies
+`pip install -r requirements.txt` 
+
+Run the Application
+
+`python src/app.py`
+
+Make a POST request to the /predict endpoint, this is a body example to predict the next 4 weeks:
+
+```
+{
+    'store_data': [
+        {
+            'Store': 1,
+            'Dept': 1,
+            'IsHoliday': True,
+            'Type': 'A',
+            'Size': 1234,
+            'date': '26/02/2011'
+        },
+                {
+            'Store': 1,
+            'Dept': 1,
+            'IsHoliday': False,
+            'Type': 'A',
+            'Size': 12345,
+            'date': '05/03/2011'
+        },
+                {
+            'Store': 1,
+            'Dept': 1,
+            'IsHoliday': False,
+            'Type': 'A',
+            'Size': 123456,
+            'date': '12/03/2011'
+        },
+                {
+            'Store': 1,
+            'Dept': 1,
+            'IsHoliday': True,
+            'Type': 'A',
+            'Size': 123456,
+            'date': '19/03/2011'
+        },
+    ]
+}
+```
 
 ## Project structure
 ### Notebooks
