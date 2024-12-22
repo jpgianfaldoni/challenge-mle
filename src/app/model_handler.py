@@ -27,14 +27,6 @@ class XGBoostModel:
             raise Exception(f"Preprocessor file not found at {self.preprocessor_path}")
 
     def predict(self, input_data):
-        # '''{
-        # 'Store': number,
-        # 'Dept': string,
-        # 'IsHoliday': boolean,
-        # 'Type': string,
-        # 'Size':number,
-        # 'date':timestamp
-        # }'''
         processed_data = self.process_input(input_data)
         input_data_transformed = self.preprocessor.transform(processed_data)
         predictions = self.model.predict(input_data_transformed)
