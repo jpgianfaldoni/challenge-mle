@@ -59,6 +59,10 @@ Make a POST request to the /predict endpoint, this is a body example to predict 
 
 ## Project structure
 
+## Presentation
+
+Folder containing the final presentation notebook
+
 ### Notebooks
 
 Folder containing the following notebooks:
