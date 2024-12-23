@@ -2,6 +2,8 @@ import pandas as pd
 from prophet import Prophet
 import matplotlib.pyplot as plt
 from pathlib import Path
+from prophet.diagnostics import performance_metrics
+
 
 
 class ProphetModel:
@@ -26,8 +28,8 @@ class ProphetModel:
         'holiday': 'new_year',
         'ds': pd.to_datetime(['2010-12-31', '2011-12-30']),
         })
-        christmas = pd.DataFrame({
-        'holiday': 'christmas',
+        thanksgiving = pd.DataFrame({
+        'holiday': 'thanksgiving',
         'ds': pd.to_datetime(['2010-11-26', '2011-11-25']),
         'lower_window': 0,
         'upper_window': 1,
@@ -44,7 +46,7 @@ class ProphetModel:
         'lower_window': 0,
         'upper_window': 1,
         })
-        return pd.concat((new_years, superbowls, christmas,labor_days))
+        return pd.concat((new_years, superbowls, thanksgiving,labor_days))
  
     def create_model(self):
         model = Prophet(holidays=self.holidays, holidays_prior_scale = 50)
@@ -72,3 +74,9 @@ class ProphetModel:
         next_year.loc[:, 'store'] = store
         next_year.loc[:, 'department'] = department
         return next_year
+
+    def performance(self):
+        from prophet.diagnostics import cross_validation
+        df_cv = cross_validation(self.model, initial='365 days', period='15 days', horizon = '365 days')
+        df_p = performance_metrics(df_cv)
+        return df_p
