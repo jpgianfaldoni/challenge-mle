@@ -77,6 +77,6 @@ class ProphetModel:
 
     def performance(self):
         from prophet.diagnostics import cross_validation
-        df_cv = cross_validation(self.model, initial='365 days', period='15 days', horizon = '365 days')
+        df_cv = cross_validation(self.model, initial='400 days', period='30 days', horizon = '365 days')
         df_p = performance_metrics(df_cv)
         return df_p
