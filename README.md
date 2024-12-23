@@ -59,9 +59,9 @@ Make a POST request to the /predict endpoint, this is a body example to predict 
 
 ## Project structure
 
-## Presentation
+### Presentation
 
-Folder containing the final presentation notebook
+Folder containing the final presentation notebook **final_presentation.ipynb**
 
 ### Notebooks
 
