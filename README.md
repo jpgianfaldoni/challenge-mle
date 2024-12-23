@@ -14,7 +14,7 @@ Install dependencies
 
 Run the Application
 
-`python src/app.py`
+`python src/app/app.py`
 
 Make a POST request to the /predict endpoint, this is a body example to predict the next 4 weeks:
 
