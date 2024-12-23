@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
 from model_handler import XGBoostModel
-from datetime import timedelta,datetime
 
 app = Flask(__name__)
 
