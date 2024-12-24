@@ -10,6 +10,7 @@ cd challenge-mle
 ```
 
 Install dependencies
+`brew install libomp`
 `pip install -r requirements.txt`
 
 Run the Application
