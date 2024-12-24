@@ -5,7 +5,7 @@
 Clone the Repository
 
 ```
-git clone https://github.com/your-username/challenge-mle.git
+git clone git@github.com:jpgianfaldoni/challenge-mle.git
 cd challenge-mle
 ```
 
