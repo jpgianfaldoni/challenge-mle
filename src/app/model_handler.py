@@ -13,7 +13,6 @@ class XGBoostModel:
         try:
             with open(self.model_path, "rb") as file:
                 self.model = pickle.load(file)
-            print("Model loaded successfully.")
         except FileNotFoundError:
             raise Exception(f"Model file not found at {self.model_path}")
         
@@ -22,7 +21,6 @@ class XGBoostModel:
         try:
             with open(self.preprocessor_path, "rb") as file:
                 self.preprocessor = pickle.load(file)
-            print("Preprocessor loaded successfully.")
         except FileNotFoundError:
             raise Exception(f"Preprocessor file not found at {self.preprocessor_path}")
 
@@ -61,25 +59,25 @@ class XGBoostModel:
             historical_avg = df_filtered[df_filtered['Date'].dt.isocalendar().week == week_number][col].mean()
             lagged_features[avg_col_name] = [historical_avg]
         return lagged_features
-    
+    def check_if_holiday(self, week, df):
+        return df[(df['week'] == week) & (df['IsHoliday'] == True)].shape[0] > 0
     def process_input(self, data):        
         parsed_date = datetime.strptime(data['date'], "%d/%m/%Y")
-
         data['week'] = parsed_date.isocalendar().week
         data['month'] = parsed_date.month
         data['day'] = parsed_date.day  
+        df = pd.read_csv('data/combined_data.csv')
         original_data = {
             'Date': parsed_date,
             'Store': data['Store'],
             'Dept': data['Dept'], 
-            'IsHoliday': bool(data['IsHoliday']),  
-            'Type': data['Type'],  
-            'Size': data['Size'],
+            'IsHoliday': self.check_if_holiday(data['week'],df),  
+            'Type': data['Type'],
+            'Size':data['Size'],
             'week': data['week'],
             'month': data['month'],
             'day': data['day']
         }
-        df = pd.read_csv('data/combined_data.csv')
         df = self.create_lagged_features(df, original_data['Store'],original_data['Dept'],original_data['Date'])
         for key, value in original_data.items():
             df[key] = value

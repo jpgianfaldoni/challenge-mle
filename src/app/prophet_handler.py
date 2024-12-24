@@ -3,80 +3,58 @@ from prophet import Prophet
 import matplotlib.pyplot as plt
 from pathlib import Path
 from prophet.diagnostics import performance_metrics
+from prophet.serialize import model_from_json
 
 
 
 class ProphetModel:
-    def __init__(self):
-        self.regressors = ['Size','Store', 'Dept','MarkDown1','MarkDown2', 'MarkDown3', 'MarkDown4', 'MarkDown5']
-        self.holidays = self.create_holidays()
-        self.forecast = None
-        self.model = None
-    def load_store_data(self, store, department):
-        base_path = Path(__file__).resolve().parent.parent.parent 
-        data_path = base_path / 'data' / 'combined_data.csv'
-        df = pd.read_csv(data_path)
-        df['Date'] = pd.to_datetime(df['Date'])
-        df = df.fillna(0)
-        store_data = df[(df['Store'] == store) & (df['Dept'] == department)]
-        store_data = store_data[['Date', 'Weekly_Sales', 'Size','Store', 'Dept','MarkDown1','MarkDown2', 'MarkDown3', 'MarkDown4', 'MarkDown5']]
-        store_data.columns = ['ds', 'y', 'Size', 'Store', 'Dept','MarkDown1','MarkDown2', 'MarkDown3', 'MarkDown4', 'MarkDown5'] 
+    def __init__(self, model_path):
+        self.model_path = model_path
+        self.mode = None
+
+    def load_model(self):
+        try:
+            with open(self.model_path, 'r') as fin:
+                self.model = model_from_json(fin.read()) 
+            print("Model loaded successfully.")
+        except FileNotFoundError:
+            raise Exception(f"Model file not found at {self.model_path}")
+        
+    
+    def create_future_df(self, df, store, dept, horizon):
+        single_store = df[(df['Store'] == store) & (df['Dept'] == dept)]
+        single_store = single_store.sort_values(by='ds', ascending=True)
+        last_row = single_store.tail(1)
+        last_date = pd.to_datetime(last_row['ds'].iloc[0])
+        future_df = pd.DataFrame({
+            'ds': [last_date + pd.DateOffset(weeks=i) for i in range(1, horizon)]
+        })
+        future_df = future_df.join(single_store.tail(horizon).reset_index(drop=True).drop(columns=['ds']))
+        return future_df
+    
+    def load_and_process_data(self):
+        df = pd.read_csv('../../data/combined_data.csv')
+        df = df.sort_index()
+        df.set_index('Date', inplace=True)
+        df['lag_weekly_sales'] = df.groupby(['Store', 'Dept'])['Weekly_Sales'].shift(52)
+        df.reset_index(inplace=True)
+        df = df.dropna(subset=['lag_weekly_sales'])
+        store_data = df[['Date', 'Weekly_Sales', 'Size','Store', 'Dept','MarkDown1','MarkDown2', 'MarkDown3', 'MarkDown4', 'MarkDown5', 'week', 'month', 'day', 'lag_weekly_sales']].copy()
+        store_data.columns = ['ds', 'y', 'Size', 'Store', 'Dept','MarkDown1','MarkDown2', 'MarkDown3', 'MarkDown4', 'MarkDown5', 'week', 'month', 'day', 'lag_weekly_sales']
+        markDowns = ['MarkDown1','MarkDown2', 'MarkDown3', 'MarkDown4', 'MarkDown5']
+        for markdown in markDowns:
+            store_data[markdown] = store_data[markdown].fillna(value=store_data[markdown].mean()) 
         return store_data
+        
 
-    def create_holidays(self):
-        new_years = pd.DataFrame({
-        'holiday': 'new_year',
-        'ds': pd.to_datetime(['2010-12-31', '2011-12-30']),
-        })
-        thanksgiving = pd.DataFrame({
-        'holiday': 'thanksgiving',
-        'ds': pd.to_datetime(['2010-11-26', '2011-11-25']),
-        'lower_window': 0,
-        'upper_window': 1,
-        })
-        superbowls = pd.DataFrame({
-        'holiday': 'superbowl',
-        'ds': pd.to_datetime(['2010-02-12', '2012-02-10', '2011-02-11']),
-        'lower_window': 0,
-        'upper_window': 1,
-        })
-        labor_days = pd.DataFrame({
-        'holiday': 'labor_day',
-        'ds': pd.to_datetime(['2010-09-10', '2011-09-09', '2012-09-07']),
-        'lower_window': 0,
-        'upper_window': 1,
-        })
-        return pd.concat((new_years, superbowls, thanksgiving,labor_days))
- 
-    def create_model(self):
-        model = Prophet(holidays=self.holidays, holidays_prior_scale = 50)
-        model.add_country_holidays(country_name='US')
-        for regressor in self.regressors:
-            model.add_regressor(regressor)
-        return model
+    def predict(self, store, dept, horizon):
+        original_data = self.load_and_process_data()
+        future_df = self.create_future_df(original_data, store,dept)
+        forecast = self.model.predict(future_df)
+        prediction = forecast[['ds', 'yhat']].copy()
+        prediction.columns = ['date', 'weekly_sales']
+        prediction['Store'] = store
+        prediction['Dept'] = dept
+        return prediction
 
-    def plot_prediction(self):
-        self.model.plot(self.forecast)
-        plt.title(f"Forecast for Store")
-        plt.show()
-    def predict(self, store, department):
-        store_data = self.load_store_data(store, department)
-        model = self.create_model()
-        self.model = model
-        model.fit(store_data)
-        future = model.make_future_dataframe(periods=52, freq = 'W')
-        for regressor in self.regressors:
-            future[regressor] = store_data[regressor].iloc[-1]  
-        forecast = model.predict(future)
-        self.forecast = forecast
-        next_year = forecast[['ds', 'yhat']].tail(52).copy()
-        next_year.rename(columns={'ds': 'date', 'yhat': 'weekly_sales_prediction'}, inplace=True)
-        next_year.loc[:, 'store'] = store
-        next_year.loc[:, 'department'] = department
-        return next_year
 
-    def performance(self):
-        from prophet.diagnostics import cross_validation
-        df_cv = cross_validation(self.model, initial='400 days', period='30 days', horizon = '365 days')
-        df_p = performance_metrics(df_cv)
-        return df_p
