@@ -62,7 +62,7 @@ Make a POST request to the /predict endpoint, this is a body example to predict 
 
 ### Presentation
 
-Folder containing the final presentation notebook **final_presentation.ipynb**
+Folder containing the presentation notebook **presentation.ipynb**
 
 ### Notebooks
 
