@@ -53,8 +53,8 @@ def predict_next_4_weeks():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    model_path = '../models/4_weeks_prediction_xgboost.pkl'
-    preprocessor_path = '../models/4_weeks_prediction_preprocessor.pkl'
+    model_path = 'src/models/4_weeks_prediction_xgboost.pkl'
+    preprocessor_path = 'src/models/4_weeks_prediction_preprocessor.pkl'
     model = XGBoostModel(model_path,preprocessor_path)
     model.load_model()
     model.load_preprocessor()
