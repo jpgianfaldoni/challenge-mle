@@ -79,7 +79,7 @@ class XGBoostModel:
             'month': data['month'],
             'day': data['day']
         }
-        df = pd.read_csv('../../data/combined_data.csv')
+        df = pd.read_csv('data/combined_data.csv')
         df = self.create_lagged_features(df, original_data['Store'],original_data['Dept'],original_data['Date'])
         for key, value in original_data.items():
             df[key] = value
