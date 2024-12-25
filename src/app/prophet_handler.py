@@ -1,8 +1,4 @@
 import pandas as pd
-from prophet import Prophet
-import matplotlib.pyplot as plt
-from pathlib import Path
-from prophet.diagnostics import performance_metrics
 from prophet.serialize import model_from_json
 
 
@@ -27,13 +23,13 @@ class ProphetModel:
         last_row = single_store.tail(1)
         last_date = pd.to_datetime(last_row['ds'].iloc[0])
         future_df = pd.DataFrame({
-            'ds': [last_date + pd.DateOffset(weeks=i) for i in range(1, horizon)]
+            'ds': [last_date + pd.DateOffset(weeks=i) for i in range(horizon)]
         })
         future_df = future_df.join(single_store.tail(horizon).reset_index(drop=True).drop(columns=['ds']))
         return future_df
     
     def load_and_process_data(self):
-        df = pd.read_csv('../../data/combined_data.csv')
+        df = pd.read_csv('data/combined_data.csv')
         df = df.sort_index()
         df.set_index('Date', inplace=True)
         df['lag_weekly_sales'] = df.groupby(['Store', 'Dept'])['Weekly_Sales'].shift(52)
@@ -47,7 +43,7 @@ class ProphetModel:
         return store_data
         
 
-    def predict(self, data, horizon):
+    def predict(self, data):
         store = data['Store']
         dept = data['Dept']
         horizon = data['Horizon']
@@ -58,6 +54,6 @@ class ProphetModel:
         prediction.columns = ['date', 'weekly_sales']
         prediction['Store'] = store
         prediction['Dept'] = dept
-        return prediction
+        return prediction.to_dict(orient='records')
 
 
