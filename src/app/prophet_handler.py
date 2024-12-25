@@ -47,9 +47,12 @@ class ProphetModel:
         return store_data
         
 
-    def predict(self, store, dept, horizon):
+    def predict(self, data, horizon):
+        store = data['Store']
+        dept = data['Dept']
+        horizon = data['Horizon']
         original_data = self.load_and_process_data()
-        future_df = self.create_future_df(original_data, store,dept)
+        future_df = self.create_future_df(original_data, store,dept, horizon)
         forecast = self.model.predict(future_df)
         prediction = forecast[['ds', 'yhat']].copy()
         prediction.columns = ['date', 'weekly_sales']
