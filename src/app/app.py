@@ -10,7 +10,7 @@ def predict_next_4_weeks_xgboost():
     Input example: input = {
             'Store': 1,
             'Dept': 1,
-            'Type':'A'.
+            'Type':'A',
             'Size': 1234,
             'date': '26/02/2011'
         }
