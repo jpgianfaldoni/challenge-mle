@@ -19,10 +19,22 @@ Run the Application
 
 Make a POST request to the /predict endpoint (XGBoost Regressor model), this is a body example to predict the next 4 weeks:
 
+The parameters are:
+
+Store: store number
+
+Dept: department number
+
+date: starting date to predict (next 4 weeks will be predicted)
+
+Type: Store type
+
+Size: Store size
+
 ```
 curl -X POST http://127.0.0.1:5000/predict -H "Content-Type: application/json" -d '{"Store": 1, "Dept": 1, "date": "26/02/2011", "Type": "A", "Size": 1234}'
 ```
-To use Facebook's Prophet model, use the endpoint /predict-prophet:
+To use Facebook's Prophet model, use the endpoint /predict-prophet with the extra argument 'horizon' (number of weeks to predict):
 
 ```
 curl -X POST http://127.0.0.1:5000/predict-prophet \
