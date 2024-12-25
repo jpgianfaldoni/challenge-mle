@@ -17,12 +17,25 @@ Run the Application
 
 `python src/app/app.py`
 
-Make a POST request to the /predict endpoint, this is a body example to predict the next 4 weeks:
+Make a POST request to the /predict endpoint (XGBoost Regressor model), this is a body example to predict the next 4 weeks:
 
 ```
 curl -X POST http://127.0.0.1:5000/predict -H "Content-Type: application/json" -d '{"Store": 1, "Dept": 1, "date": "26/02/2011", "Type": "A", "Size": 1234}'
 ```
+To use Facebook's Prophet model, use the endpoint /predict-prophet:
 
+```
+curl -X POST http://127.0.0.1:5000/predict-prophet \
+-H "Content-Type: application/json" \
+-d '{
+    "store": 1,
+    "dept": 1,
+    "type": "A",
+    "size": 1234,
+    "date": "26/02/2011",
+    "horizon": 4
+}'
+```
 ## Project structure
 
 ### Presentation
