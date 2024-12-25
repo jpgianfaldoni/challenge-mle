@@ -62,7 +62,9 @@ Folder containing the following notebooks:
 
 **data_processing.ipynb**: processing data to be used as input for the models
 
-**4_weeks_model_training.ipynb**: training the XGBoost model that predicts the sales for each department 4 weeks ahead
+**4_weeks_model_training.ipynb**: training the XGBoost Regressor model that predicts the sales for each department 4 weeks ahead
+
+**prophet_trainign.ipynb**: training the Prophet model that predicts the sales for each department one year  ahead
 
 ### Data
 
