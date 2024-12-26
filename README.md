@@ -13,6 +13,8 @@ Install dependencies
 `brew install libomp`
 `pip install -r requirements.txt`
 
+Python version used: 3.12.7
+
 Run the Application
 
 `python src/app/app.py`
